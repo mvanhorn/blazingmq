@@ -412,6 +412,11 @@ class StorageManager BSLS_KEYWORD_FINAL
                          const AppInfos&         appIdKeyPairs,
                          bool                    isNewQueue);
 
+    void queueDeletionCb(int                     partitionId,
+                         const bmqt::Uri&        uri,
+                         const mqbu::StorageKey& queueKey,
+                         const mqbu::StorageKey& appKey);
+
     /// Callback executed when the partition having the specified
     /// `partitionId` has performed recovery and recovered file-backed
     /// queues and their virtual storages in the specified
@@ -825,17 +830,17 @@ class StorageManager BSLS_KEYWORD_FINAL
 //                              const AppInfos&         appIdKeyPairs,
 //                              mqbi::Domain* domain = 0) BSLS_KEYWORD_OVERRIDE;
 
-    void unregisterQueueReplica(int                     partitionId,
-                                const bmqt::Uri&        uri,
-                                const mqbu::StorageKey& queueKey,
-                                const mqbu::StorageKey& appKey)
-        BSLS_KEYWORD_OVERRIDE;
+//    void unregisterQueueReplica(int                     partitionId,
+//                                const bmqt::Uri&        uri,
+//                                const mqbu::StorageKey& queueKey,
+//                                const mqbu::StorageKey& appKey)
+//        BSLS_KEYWORD_OVERRIDE;
 
-    void updateQueueReplica(int                     partitionId,
-                            const bmqt::Uri&        uri,
-                            const mqbu::StorageKey& queueKey,
-                            const AppInfos&         appIdKeyPairs,
-                            mqbi::Domain* domain = 0) BSLS_KEYWORD_OVERRIDE;
+//    void updateQueueReplica(int                     partitionId,
+//                            const bmqt::Uri&        uri,
+//                            const mqbu::StorageKey& queueKey,
+//                            const AppInfos&         appIdKeyPairs,
+//                            mqbi::Domain* domain = 0) BSLS_KEYWORD_OVERRIDE;
 
     /// Reset the queue instance associated with the file-backed storage for
     /// the specified `uri` mapped to the specified `partitionId` to the

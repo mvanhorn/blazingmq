@@ -1285,12 +1285,16 @@ int StorageUtil::assignPartitionDispatcherThreads(
     bsl::ostream&                               errorDescription,
     int                                         replicationFactor,
     const RecoveredQueuesCb&                    recoveredQueuesCb,
-    const bdlb::NullableValue<QueueCreationCb>& queueCreationCb)
+    const QueueCreationCb& queueCreationCb,
+    const QueueDeletionCb& queueDeletionCb)
 {
     // executed by the cluster *DISPATCHER* thread
 
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(cluster.inDispatcherThread());
+    BSLS_ASSERT_SAFE(recoveredQueuesCb);
+    BSLS_ASSERT_SAFE(queueCreationCb);
+    BSLS_ASSERT_SAFE(queueDeletionCb);
 
     enum RcEnum {
         // Value for the various RC error categories
@@ -1328,11 +1332,9 @@ int StorageUtil::assignPartitionDispatcherThreads(
             .setMaxJournalFileSize(config.maxJournalFileSize())
             .setMaxQlistFileSize(config.maxQlistFileSize())
             .setMaxArchivedFileSets(config.maxArchivedFileSets())
-            .setRecoveredQueuesCb(recoveredQueuesCb);
-
-        if (!queueCreationCb.isNull()) {
-            dsCfg.setQueueCreationCb(queueCreationCb.value());
-        }
+            .setRecoveredQueuesCb(recoveredQueuesCb)
+            .setQueueCreationCb(queueCreationCb)
+            .setQueueDeletionCb(queueDeletionCb);
 
         // Get named allocator from associated bmqma::CountingAllocatorStore
         bslma::Allocator* fileStoreAllocator = allocators->get(
@@ -3003,32 +3005,34 @@ void StorageUtil::removeQueueStorageDispatched(
     if (appKey.isNull()) {
         // Entire queue is being deleted.
 
-        const bsls::Types::Int64 numMsgs = rs->numMessages(
-            mqbu::StorageKey::k_NULL_KEY);
-        if (0 != numMsgs) {
-            BMQTSK_ALARMLOG_ALARM("REPLICATION")
-                << fs->description()
-                << ": attempt to delete storage for queue [ " << uri
-                << "], queueKey [" << queueKey << "] which has [" << numMsgs
-                << "] outstanding messages." << BMQTSK_ALARMLOG_END;
-
-            return;  // RETURN
-        }
-
-        const mqbs::ReplicatedStorage::RecordHandles& recHandles =
-            rs->queueOpRecordHandles();
-        for (size_t idx = 0; idx < recHandles.size(); ++idx) {
-            fs->removeRecordRaw(recHandles[idx]);
-        }
-
-        BALL_LOG_INFO << fs->description() << ": deleting storage for queue ["
-                      << uri << "], queueKey [" << queueKey << "] as replica.";
+//        const bsls::Types::Int64 numMsgs = rs->numMessages(
+//            mqbu::StorageKey::k_NULL_KEY);
+//        if (0 != numMsgs) {
+//            BMQTSK_ALARMLOG_ALARM("REPLICATION")
+//                << fs->description()
+//                << ": attempt to delete storage for queue [ " << uri
+//                << "], queueKey [" << queueKey << "] which has [" << numMsgs
+//                << "] outstanding messages." << BMQTSK_ALARMLOG_END;
+//
+//            return;  // RETURN
+//        }
+//
+//        const mqbs::ReplicatedStorage::RecordHandles& recHandles =
+//            rs->queueOpRecordHandles();
+//        for (size_t idx = 0; idx < recHandles.size(); ++idx) {
+//            fs->removeRecordRaw(recHandles[idx]);
+//        }
+//
+//        BALL_LOG_INFO << fs->description() << ": deleting storage for queue ["
+//                      << uri << "], queueKey [" << queueKey << "] as replica.";
 
         fs->unregisterStorage(rs);
         storageMap->erase(it);
 
         return;  // RETURN
     }
+    BALL_LOG_INFO << fs->description() << ": deleting App for queue ["
+                  << uri << "], queueKey [" << queueKey << "], appKey [" << appKey <<"] as replica.";
 
     // A specific appId is being deleted.
     // No explicit 'purge', storage takes care of that when removing App

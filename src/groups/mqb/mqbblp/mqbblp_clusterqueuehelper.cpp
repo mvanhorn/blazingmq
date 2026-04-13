@@ -4479,10 +4479,10 @@ void ClusterQueueHelper::onQueueUnassigned(
             removeQueueRaw(queueContextIt);
         }
 
-        d_storageManager_p->unregisterQueueReplica(info->partitionId(),
-                                                   info->uri(),
-                                                   info->key(),
-                                                   mqbu::StorageKey());
+//        d_storageManager_p->unregisterQueueReplica(info->partitionId(),
+//                                                   info->uri(),
+//                                                   info->key(),
+//                                                   mqbu::StorageKey());
     }
 
     d_clusterState_p->queueKeys().erase(info->key());
@@ -4522,25 +4522,25 @@ void ClusterQueueHelper::onQueueUpdated(
     const int     partitionId  = queueContext.partitionId();
     BSLS_ASSERT_SAFE(partitionId != mqbi::Storage::k_INVALID_PARTITION_ID);
 
-    if (!d_clusterState_p->isSelfPrimary(partitionId) || queue == 0) {
-        d_storageManager_p->updateQueueReplica(partitionId,
-                                               uri,
-                                               queueContext.key(),
-                                               addedAppIds,
-                                               d_clusterState_p->domainStates()
-                                                   .at(uri.qualifiedDomain())
-                                                   ->domain());
-
-        for (AppInfos::const_iterator cit = removedAppIds.cbegin();
-             cit != removedAppIds.cend();
-             ++cit) {
-            d_storageManager_p->unregisterQueueReplica(partitionId,
-                                                       uri,
-                                                       queueContext.key(),
-                                                       cit->second);
-        }
-    }
-    // else, there is a queue AND this node is primary
+//    if (!d_clusterState_p->isSelfPrimary(partitionId) || queue == 0) {
+//        d_storageManager_p->updateQueueReplica(partitionId,
+//                                               uri,
+//                                               queueContext.key(),
+//                                               addedAppIds,
+//                                               d_clusterState_p->domainStates()
+//                                                   .at(uri.qualifiedDomain())
+//                                                   ->domain());
+//
+//        for (AppInfos::const_iterator cit = removedAppIds.cbegin();
+//             cit != removedAppIds.cend();
+//             ++cit) {
+//            d_storageManager_p->unregisterQueueReplica(partitionId,
+//                                                       uri,
+//                                                       queueContext.key(),
+//                                                       cit->second);
+//        }
+//    }
+//    // else, there is a queue AND this node is primary
 
     if (queue) {
         // This node is either replica or primary.

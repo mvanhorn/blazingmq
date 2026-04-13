@@ -131,6 +131,7 @@ struct StorageUtil {
         QueueKeyInfoMapConstIter;
 
     typedef mqbs::DataStoreConfig::QueueCreationCb   QueueCreationCb;
+    typedef mqbs::DataStoreConfig::QueueDeletionCb   QueueDeletionCb;
     typedef mqbs::DataStoreConfig::RecoveredQueuesCb RecoveredQueuesCb;
 
     typedef mqbi::StorageManager_PartitionInfo PartitionInfo;
@@ -530,8 +531,8 @@ struct StorageUtil {
         bsl::ostream&                               errorDescription,
         int                                         replicationFactor,
         const RecoveredQueuesCb&                    recoveredQueuesCb,
-        const bdlb::NullableValue<QueueCreationCb>& queueCreationCb =
-            bdlb::NullableValue<QueueCreationCb>());
+        const QueueCreationCb& queueCreationCb,
+        const QueueDeletionCb& queueDeletionCb);
 
     /// Clear the primary of the specified `partitionId` from the specified
     /// `fs` and `partitionInfo`, using the specified clusterDescription`.
